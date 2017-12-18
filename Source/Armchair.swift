@@ -472,8 +472,8 @@ public func resetDefaults() {
  * rating alert will simply be postponed until it is called again with true for
  * canPromptForRating.
  */
-public func userDidSignificantEvent(_ canPromptForRating: Bool) {
-    Manager.defaultManager.userDidSignificantEvent(canPromptForRating)
+public func userDidSignificantEvent(_ canPromptForRating: Bool, _ competitionClosure: ArmchairClosure? = nil) {
+    Manager.defaultManager.userDidSignificantEvent(canPromptForRating, competitionClosure)
 }
 
 /*
@@ -491,8 +491,8 @@ public func userDidSignificantEvent(_ canPromptForRating: Bool) {
  * The closure is run synchronous and on the main queue, so be sure to handle it appropriately.
  * Return true to proceed and show the prompt, return false to kill the pending presentation.
  */
-public func userDidSignificantEvent(_ shouldPrompt: @escaping ArmchairShouldPromptClosure) {
-    Manager.defaultManager.userDidSignificantEvent(shouldPrompt)
+public func userDidSignificantEvent(_ shouldPrompt: @escaping ArmchairShouldPromptClosure, _ competitionClosure: ArmchairClosure? = nil) {
+    Manager.defaultManager.userDidSignificantEvent(shouldPrompt, competitionClosure)
 }
 
 // MARK: Prompts
@@ -969,15 +969,17 @@ open class Manager : ArmchairManager {
     // MARK: -
     // MARK: PRIVATE Methods
     
-    fileprivate func userDidSignificantEvent(_ canPromptForRating: Bool) {
+    fileprivate func userDidSignificantEvent(_ canPromptForRating: Bool, _ competitionClosure: ArmchairClosure? = nil) {
         DispatchQueue.global(qos: .background).async {
             self.incrementSignificantEventAndRate(canPromptForRating)
+            competitionClosure?()
         }
     }
     
-    fileprivate func userDidSignificantEvent(_ shouldPrompt: @escaping ArmchairShouldPromptClosure) {
+    fileprivate func userDidSignificantEvent(_ shouldPrompt: @escaping ArmchairShouldPromptClosure, _ competitionClosure: ArmchairClosure? = nil) {
         DispatchQueue.global(qos: .background).async {
             self.incrementSignificantEventAndRate(shouldPrompt)
+            competitionClosure?()
         }
     }
     

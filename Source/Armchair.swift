@@ -717,7 +717,7 @@ public enum ArmchairKey: String, CustomStringConvertible {
 }
 
 open class ArmchairTrackingInfo: CustomStringConvertible {
-    open let info: Dictionary<ArmchairKey, AnyObject>
+    public let info: Dictionary<ArmchairKey, AnyObject>
     
     init(info: Dictionary<ArmchairKey, AnyObject>) {
         self.info = info
@@ -1217,11 +1217,17 @@ open class Manager : ArmchairManager {
     }
     
     public var shouldTryStoreKitReviewPrompt : Bool {
-        if #available(iOS 10.3, *), useStoreKitReviewPrompt { return true }
+        #if os(iOS)
+            if #available(iOS 10.3, *), useStoreKitReviewPrompt {
+                return true
+            }
+        #endif
+
         return false
     }
     
     fileprivate func requestStoreKitReviewPrompt() -> Bool {
+        #if os(iOS)
         if #available(iOS 10.3, *), useStoreKitReviewPrompt {
             SKStoreReviewController.requestReview()
             // Assume this version is rated. There is no API to tell if the user actaully rated.
@@ -1232,6 +1238,7 @@ open class Manager : ArmchairManager {
             closeModalPanel()
             return true
         }
+        #endif
         return false
     }
     
@@ -1256,20 +1263,20 @@ open class Manager : ArmchairManager {
                     
                 } else {
                     /// Didn't show storekit prompt, present app store manually
-                    let alertView : UIAlertController = UIAlertController(title: reviewTitle, message: reviewMessage, preferredStyle: UIAlertControllerStyle.alert)
-                    alertView.addAction(UIAlertAction(title: cancelButtonTitle, style:UIAlertActionStyle.default, handler: {
+                    let alertView : UIAlertController = UIAlertController(title: reviewTitle, message: reviewMessage, preferredStyle: .alert)
+                    alertView.addAction(UIAlertAction(title: rateButtonTitle, style: .default, handler: {
                         (alert: UIAlertAction!) in
-                        self.dontRate()
+                        self._rateApp()
                     }))
                     if (showsRemindButton()) {
-                        alertView.addAction(UIAlertAction(title: remindButtonTitle!, style:UIAlertActionStyle.default, handler: {
+                        alertView.addAction(UIAlertAction(title: remindButtonTitle!, style: .default, handler: {
                             (alert: UIAlertAction!) in
                             self.remindMeLater()
                         }))
                     }
-                    alertView.addAction(UIAlertAction(title: rateButtonTitle, style:UIAlertActionStyle.cancel, handler: {
+                    alertView.addAction(UIAlertAction(title: cancelButtonTitle, style: .cancel, handler: {
                         (alert: UIAlertAction!) in
-                        self._rateApp()
+                        self.dontRate()
                     }))
 
                     ratingAlert = alertView
@@ -1442,8 +1449,8 @@ open class Manager : ArmchairManager {
                     UIApplication.shared.openURL(url)
                 }
             }  
-            // Check for iOS simulator
-            #if (arch(i386) || arch(x86_64)) && os(iOS)
+
+            #if targetEnvironment(simulator)
                 debugLog("iTunes App Store is not supported on the iOS simulator.")
                 debugLog(" - We would have went to \(reviewURLString()).")
                 debugLog(" - Try running on a test-device")
@@ -1719,11 +1726,11 @@ open class Manager : ArmchairManager {
     private static func getRootViewController() -> UIViewController? {
         if var window = UIApplication.shared.keyWindow {
             
-            if window.windowLevel != UIWindowLevelNormal {
+            if window.windowLevel != .normal {
                 let windows: NSArray = UIApplication.shared.windows as NSArray
                 for candidateWindow in windows {
                     if let candidateWindow = candidateWindow as? UIWindow {
-                        if candidateWindow.windowLevel == UIWindowLevelNormal {
+                        if candidateWindow.windowLevel == .normal {
                             window = candidateWindow
                             break
                         }
@@ -1829,9 +1836,9 @@ open class Manager : ArmchairManager {
     
     fileprivate func setupNotifications() {
         #if os(iOS)
-            NotificationCenter.default.addObserver(self, selector: #selector(Manager.appWillResignActive(_:)),            name: NSNotification.Name.UIApplicationWillResignActive,    object: nil)
-            NotificationCenter.default.addObserver(self, selector: #selector(Manager.applicationDidFinishLaunching(_:)),  name: NSNotification.Name.UIApplicationDidFinishLaunching,  object: nil)
-            NotificationCenter.default.addObserver(self, selector: #selector(Manager.applicationWillEnterForeground(_:)), name: NSNotification.Name.UIApplicationWillEnterForeground, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(Manager.appWillResignActive(_:)), name: UIApplication.willResignActiveNotification,    object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(Manager.applicationDidFinishLaunching(_:)),  name: UIApplication.didFinishLaunchingNotification,  object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(Manager.applicationWillEnterForeground(_:)), name: UIApplication.willEnterForegroundNotification, object: nil)
         #elseif os(OSX)
             NotificationCenter.default.addObserver(self, selector: #selector(Manager.appWillResignActive(_:)), name: NSApplication.willResignActiveNotification, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(Manager.applicationDidFinishLaunching(_:)), name: NSApplication.didFinishLaunchingNotification, object: nil)

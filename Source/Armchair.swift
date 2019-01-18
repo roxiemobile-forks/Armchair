@@ -968,13 +968,13 @@ open class Manager : ArmchairManager {
     // MARK: PRIVATE Methods
     
     fileprivate func userDidSignificantEvent(_ canPromptForRating: Bool) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.main.async {
             self.incrementSignificantEventAndRate(canPromptForRating)
         }
     }
     
     fileprivate func userDidSignificantEvent(_ shouldPrompt: @escaping ArmchairShouldPromptClosure) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.main.async {
             self.incrementSignificantEventAndRate(shouldPrompt)
         }
     }
@@ -1799,7 +1799,7 @@ open class Manager : ArmchairManager {
     }
     
     @objc public func applicationDidFinishLaunching(_ notification: Notification) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.main.async {
             self.debugLog("applicationDidFinishLaunching:")
             self.migrateKeysIfNecessary()
             self.incrementUseCount()
@@ -1807,7 +1807,7 @@ open class Manager : ArmchairManager {
     }
     
     @objc public func applicationWillEnterForeground(_ notification: Notification) {
-        DispatchQueue.global(qos: .background).async {
+        DispatchQueue.main.async {
             self.debugLog("applicationWillEnterForeground:")
             self.migrateKeysIfNecessary()
             self.incrementUseCount()

@@ -1059,7 +1059,7 @@ open class Manager : ArmchairManager {
             }
             
             // Increment the key's count
-            var incrementKeyCount = userDefaultsObject!.integerForKey(incrementKey)
+            var incrementKeyCount = userDefaultsObject?.integerForKey(incrementKey) ?? 0
             incrementKeyCount += 1
             
             userDefaultsObject?.setInteger(incrementKeyCount, forKey:incrementKey)

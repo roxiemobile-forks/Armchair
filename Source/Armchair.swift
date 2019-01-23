@@ -675,7 +675,11 @@ public func logger(_ logger: @escaping ArmchairLogger) {
 }
 
 open class StandardUserDefaults: ArmchairDefaultsObject {
-    let defaults = UserDefaults.standard
+    private let userDefaults = UserDefaults.standard
+
+    open var defaults: UserDefaults {
+        return userDefaults
+    }
     
     @objc open func objectForKey(_ defaultName: String) -> AnyObject?             { return defaults.object(forKey: defaultName) as AnyObject? }
     @objc open func setObject(_ value: AnyObject?, forKey defaultName: String)    { defaults.set(value, forKey: defaultName) }
@@ -691,7 +695,15 @@ open class StandardUserDefaults: ArmchairDefaultsObject {
     @objc open func setBool(_ value: Bool, forKey defaultName: String)            { defaults.set(value, forKey: defaultName) }
     
     @discardableResult
-    @objc open func synchronize() -> Bool                                       { return defaults.synchronize() }
+    @objc open func synchronize() -> Bool                                         { return defaults.synchronize() }
+}
+
+open class VendorUserDefaults: StandardUserDefaults {
+    private let userDefaults = UserDefaults(suiteName: "com.github.UrbanApps.Armchair")!
+
+    open override var defaults: UserDefaults {
+        return userDefaults
+    }
 }
 
 public enum ArmchairKey: String, CustomStringConvertible {

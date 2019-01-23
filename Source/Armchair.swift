@@ -325,30 +325,34 @@ public func debugEnabled(_ debugEnabled: Bool) {
  Reset all counters manually. This resets UseCount, SignificantEventCount and FirstUseDate (daysUntilPrompt)
  */
 public func resetUsageCounters() {
-    StandardUserDefaults().setObject(NSNumber(value: Date().timeIntervalSince1970), forKey: keyForArmchairKeyType(ArmchairKey.FirstUseDate))
-    StandardUserDefaults().setObject(NSNumber(value: 1), forKey: keyForArmchairKeyType(ArmchairKey.UseCount))
-    StandardUserDefaults().setObject(NSNumber(value: 0), forKey: keyForArmchairKeyType(ArmchairKey.SignificantEventCount))
-    StandardUserDefaults().synchronize()
+    guard let userDefaults = userDefaultsObject() else { return }
+
+    userDefaults.setObject(NSNumber(value: Date().timeIntervalSince1970), forKey: keyForArmchairKeyType(ArmchairKey.FirstUseDate))
+    userDefaults.setObject(NSNumber(value: 1), forKey: keyForArmchairKeyType(ArmchairKey.UseCount))
+    userDefaults.setObject(NSNumber(value: 0), forKey: keyForArmchairKeyType(ArmchairKey.SignificantEventCount))
+    userDefaults.synchronize()
 }
 
 /**
  Reset all values tracked by Armchair to initial state.
  */
 public func resetAllCounters() {
+    guard let userDefaults = userDefaultsObject() else { return }
+
     let currentVersionKey = keyForArmchairKeyType(ArmchairKey.CurrentVersion)
-    let trackingVersion: String? = StandardUserDefaults().stringForKey(currentVersionKey)
+    let trackingVersion: String? = userDefaults.stringForKey(currentVersionKey)
     let bundleVersionKey = kCFBundleVersionKey as String
     let currentVersion = Bundle.main.object(forInfoDictionaryKey: bundleVersionKey) as? String
-    
-    StandardUserDefaults().setObject(trackingVersion as AnyObject?, forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersion))
-    StandardUserDefaults().setObject(StandardUserDefaults().objectForKey(keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionRated))
-    StandardUserDefaults().setObject(StandardUserDefaults().objectForKey(keyForArmchairKeyType(ArmchairKey.DeclinedToRate)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionDeclinedToRate))
-    StandardUserDefaults().setObject(currentVersion as AnyObject?, forKey: currentVersionKey)
+
+    userDefaults.setObject(trackingVersion as AnyObject?, forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersion))
+    userDefaults.setObject(userDefaults.objectForKey(keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionRated))
+    userDefaults.setObject(userDefaults.objectForKey(keyForArmchairKeyType(ArmchairKey.DeclinedToRate)), forKey: keyForArmchairKeyType(ArmchairKey.PreviousVersionDeclinedToRate))
+    userDefaults.setObject(currentVersion as AnyObject?, forKey: currentVersionKey)
     resetUsageCounters()
-    StandardUserDefaults().setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion))
-    StandardUserDefaults().setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.DeclinedToRate))
-    StandardUserDefaults().setObject(NSNumber(value: 0), forKey: keyForArmchairKeyType(ArmchairKey.ReminderRequestDate))
-    StandardUserDefaults().synchronize()
+    userDefaults.setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.RatedCurrentVersion))
+    userDefaults.setObject(NSNumber(value: false), forKey: keyForArmchairKeyType(ArmchairKey.DeclinedToRate))
+    userDefaults.setObject(NSNumber(value: 0), forKey: keyForArmchairKeyType(ArmchairKey.ReminderRequestDate))
+    userDefaults.synchronize()
 }
 
 /*

@@ -28,7 +28,7 @@
     class AppDelegate: UIResponder, UIApplicationDelegate {
         var window: UIWindow?
         
-        func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
             AppDelegate.setupArmchair()
             return true
         }
@@ -70,6 +70,7 @@ extension AppDelegate {
         // NOTE: The appID call always has to go before any other Armchair calls
         Armchair.appID(appID)
         Armchair.debugEnabled(true)
+        Armchair.userDefaultsObject(ArmchairUserDefaults())
     }
 }
 

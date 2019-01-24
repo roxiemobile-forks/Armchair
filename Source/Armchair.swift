@@ -677,6 +677,8 @@ public func logger(_ logger: @escaping ArmchairLogger) {
 open class StandardUserDefaults: ArmchairDefaultsObject {
     private let userDefaults = UserDefaults.standard
 
+    public init() {}
+
     open var defaults: UserDefaults {
         return userDefaults
     }
@@ -698,7 +700,7 @@ open class StandardUserDefaults: ArmchairDefaultsObject {
     @objc open func synchronize() -> Bool                                         { return defaults.synchronize() }
 }
 
-open class VendorUserDefaults: StandardUserDefaults {
+open class ArmchairUserDefaults: StandardUserDefaults {
     private let userDefaults = UserDefaults(suiteName: "com.github.UrbanApps.Armchair")!
 
     open override var defaults: UserDefaults {
